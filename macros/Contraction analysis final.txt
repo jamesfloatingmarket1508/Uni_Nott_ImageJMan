@@ -1,0 +1,236 @@
+
+//run("Select None");
+if (nImages==0)
+	run("Image Sequence...");
+if (nSlices<2) exit("This macro requires a stack");
+rename("LocalDifference");
+
+setBatchMode(true);
+a = nSlices;
+for(i=1, k=2; i<=a; i+=2, k+=2){
+run("Duplicate...", "tilte=[Stack-i] duplicate range=i-i");
+rename(1);
+if (nImages==2){
+selectWindow("1");
+run("Duplicate...", "title=2");
+rename(2);
+}
+imageCalculator("Difference create", "2","1");
+run("Measure");
+close("Result of 2");
+close("2");
+selectWindow("LocalDifference");
+run("Duplicate...", "tilte=[Stack-k] duplicate range=k-k");
+rename(2);
+imageCalculator("Difference create ","1","2");
+run("Measure");
+close("Result of 1");
+close("1");
+selectWindow("LocalDifference");
+}
+setBatchMode(false);
+
+n = nResults-1;
+
+y = newArray(n);
+x = newArray(n);
+m = 0.01;
+for(i=0; i<n; i++) {
+	x[i]=m;
+	y[i]=getResult("Mean",i+1);
+      m+=0.01;
+	}
+
+//1st Derivitave f(x) = dx/dy = ((x+1)-x)/((y+1)-1
+
+dy = newArray(n);
+dy[0] = 0;
+for (i=0; i<n-1; i++) {
+    dy[i] = y[i+1]-y[i];
+    }
+
+//Plot.create("Contraction Profile","Time","Amplitude", x, y);
+Plot.create("1st Deviation","Time","d(Amplitude)", x, dy);
+Plot.show();
+//select minimum Peak Hight
+p = 1;
+Dialog.create("Select minmum Peak high");
+Dialog.addNumber("min",p);
+Dialog.show();
+p = Dialog.getNumber();
+close("1st Deviation");
+//find maxima in array (named minima in case start point for contraction analysis
+//get x coordinates for maximas
+minvalues= Array.findMaxima(dy, p);
+//print("\\Clear");
+for (i=0; i<minvalues.length; i++){
+	x = minvalues[i];
+	y = dy[x];
+	//print(x,y);
+}
+Array.sort(minvalues);
+//Array.show("Minima",minvalues);
+
+setBatchMode(true);
+
+for (i=0; i<minvalues.length; i++){
+	minvalues[i] = minvalues[i]-2;
+	//Array.show(minvalues);
+} 
+f=0;
+g=0;
+cd = newArray(f);
+// Calculate contraction profile from stack difference between iStart and iEnd which represent start of the peaks 
+selectWindow("LocalDifference");
+for (i=0; i<minvalues.length-1; i++){
+	iStart = minvalues[i];
+	iEnd = minvalues[i+1];
+
+	run("Duplicate...", "duplicate range=iStart-iStart");
+	rename("iStart");
+	selectWindow("LocalDifference");
+	run("Duplicate...", "duplicate range=iStart-iEnd");
+	rename("iEnd");
+
+	imageCalculator("Difference create stack ","iEnd","iStart");
+	close("iEnd");
+	close("iStart");
+	run("Plot Z-axis Profile");
+	close("Result of iEnd");
+	Plot.getValues(x,y);
+	run("Close");
+	
+	// j starts at 1 in the next two loops in order to skip zero value
+		y2= y[y.length-1];
+		y1 = y[1];
+		for (j=1; j<x.length; j++){		
+   		y[j] =y[j]-((((y2-y1)/(x.length-1))*j)+y1);
+	}
+	cd = Array.concat(cd, y);
+	selectWindow("LocalDifference");
+}
+setBatchMode(false);
+if(nResults>=0) run("Clear Results");
+Plot.create("contraction profile", "Time", "Amplitude", cd);
+Plot.show();
+
+b = minvalues[0];
+	for (i=0; i<minvalues.length; i++){
+	b = (b-1);
+	minvalues[i] = minvalues[i] -b;
+	minvalues[i] = minvalues[i] -1;
+	}
+
+n = cd.length;
+x1 = newArray(n);
+m = 0;
+	for (i=0; i<n; i++){
+	x1[i] = m;
+	m+=1;
+}
+// Assume contraction profile data in x[] and y[]
+// Assume contraction start indexes in start_index[] (copied from 'minvalues', or rename 'minvalues' to 'start_index')
+
+function Assert(cond; msg) {
+	if (cond==0)
+		print(msg);
+}
+// Calculate contraction parameters for each contraction in profile
+if (minvalues.length<2){ 
+	print("Need at least 2 contractions to analyze");
+}
+for (ic=0; ic<minvalues.length-1; ic++) {
+	iStart = minvalues[ic];
+	iEnd = minvalues[ic+1];
+	x = Array.slice(x1, iStart, iEnd);
+	y = Array.slice(cd, iStart, iEnd);
+AnalyzeContraction(x,y);
+}
+
+function AnalyzeContraction(x, y) {
+	// Takes (x,y) arrays for one contraction profile,
+	// calculates contraction parameters
+	// and adds parameters to a new line in Results table
+	x0 = x[0];
+	Array.getStatistics(y, y0, y100, ymean, ystd);
+	amplitude = y100 - y0;
+	m = Array.findMaxima(y, amplitude*0.9);
+	if(m.length>1){
+	print( "Contraction has more than one peak");
+	}
+	i100 = m[0];
+	x100 = x[i100];	// absolute time; for time relative to start of contraction, subtract x0
+	// Find level crossing times
+	u99 = FindPercentLevelCrossing(x, y, 99, 1);
+	// upstroke time at 50% amplitude
+	d90 = FindPercentLevelCrossing(x, y, 10, -1);
+	d80 = FindPercentLevelCrossing(x, y, 20, -1);
+	d75 = FindPercentLevelCrossing(x, y, 25, -1);
+	d70 = FindPercentLevelCrossing(x, y, 30, -1);
+	d60 = FindPercentLevelCrossing(x, y, 40, -1);
+	d50 = FindPercentLevelCrossing(x, y, 50, -1);
+	d40 = FindPercentLevelCrossing(x, y, 60, -1);
+	d30 = FindPercentLevelCrossing(x, y, 70, -1);
+	d20 = FindPercentLevelCrossing(x, y, 80, -1);
+	d10 = FindPercentLevelCrossing(x, y, 90, -1);
+
+
+	// downstroke time at 50% amplitude
+	// .. repeat for other desired %levels
+	// Add calculated parameters to Results table window
+	k = nResults;
+	setResult("Amp", k, amplitude);
+	setResult("Mean", k, iEnd-iStart);	
+	setResult("TTP", k, u99-x0);
+	setResult("CD10", k, d10-x0);
+	setResult("CD20", k, d20-x0);
+	setResult("CD30", k, d30-x0);
+	setResult("CD40", k, d40-x0);
+	setResult("CD50", k, d50-x0);
+	setResult("CD60", k, d60-x0);
+	setResult("CD70", k, d70-x0);
+	setResult("CD75", k, d80-x0);
+	setResult("CD80", k, d80-x0);
+	setResult("CD90", k, d90-x0);		
+}
+
+function FindPercentLevelCrossing(x, y, pc, kdir) {
+	if((pc<=1)&&(pc>=99)){
+	print( "Percent level must be in range 1-99");
+	}
+	// Calculate level from data and pc (%)
+	Array.getStatistics(y, y0, y100, ymean, ystd);
+	level = y0 + (y100-y0)*(pc/100);
+	found = 0;
+	if (kdir==1) {		// search forwards from start
+		i = 0;
+		while (i<y.length && found==0) {
+			if (y[i]>level) {
+				if (y[i-1]==y[i])
+					xcross = 0;
+				else
+					xcross = x[i] - (y[i]-level) * (x[i]-x[i-1]) / (y[i]-y[i-1]);
+				found = 1;
+			}
+			i++;
+		}
+	} else {			// search backwards from end
+		i = y.length-2;
+		while (i>=0 && found==0) {
+			if (y[i]>level) {
+				if (y[i+1]==y[i])
+					xcross = 0;
+				else
+					xcross = x[i] - (y[i]-level) * (x[i+1]-x[i]) / (y[i]-y[i+1]);
+				found = 1;
+			}
+			i--;
+		}
+	}
+	if(xcross<0){
+	print( "FindPercentLevelCrossing failed");
+	}
+
+	return xcross;
+}
+//xcross first x[i] + (level-y[i]) / (y[i]-y[i-1]);
