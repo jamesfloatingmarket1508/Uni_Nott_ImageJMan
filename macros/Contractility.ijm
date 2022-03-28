@@ -548,22 +548,31 @@ macro "Contractility" {
 		setResult("Interval", lastrow, "");
 		
 		// Save average profile to text file
-		f = File.open(dirname+slicename+"_avg"+".txt");
+		f = File.open(dirname+dataname+"_avg"+".txt");
 		for (i=0; i<navg; i++)
 			print(f, xavg[i]+"\t"+yavg[i]);
 		File.close(f);
 		}
 	
+	/*	James wrote 
+		
+		
 
-	// James wrote feature 2 
+	*/ 	
+		fileTxtPath = dirname+dataname+"_horizontal"+".txt";
+		displayHorizontallyTraceAndTimeToFile(xc,yc,fileTxtPath);
+		extractMeanRowToTxtFile();
+
+
+	// James wrote function change csv name 2 days
 	if (save_results) {
 		updateResults();
 		//saveAs("results", dirname+slicename+".csv");
 		saveAs("results", dirname+dataname+".csv");
 		}
-	
-	extractMeanRowToTxtFile();
 
+	
+	
 	showStatus("Done");
 	
 	// James wrote feature 2
@@ -574,14 +583,14 @@ macro "Contractility" {
 } // End macro "Contractility"
 
 
+// James wrote fuction 2 extract Mean data  3 days
 function extractMeanRowToTxtFile(){
 
-	// James wrote feature 3
 	path =   dirname+dataname+".csv" ;
 	parent = File.getParent(path) ;
 	originalselectedFolder = File.getParent(parent) ;
-	pathFileTxt = originalselectedFolder+ "all_mean_row" +".txt";
-
+	meanTxtFile = originalselectedFolder + File.getName(originalselectedFolder)+"_MEAN_" +".txt";
+	
 	headings = split(String.getResultsHeadings);
 
 	for (row=0; row<nResults; row++) {
@@ -592,9 +601,52 @@ function extractMeanRowToTxtFile(){
 		        line = line + getResultString(headings[col],row) + "  ";
 		     }   
 		     // append mean row to the end of file  
-		     File.append(line , pathFileTxt);
+		     File.append(line , meanTxtFile);
 	     }
 	  }
+}
+
+// James wrote function 3 time trace - 4 days
+function displayHorizontallyTraceAndTimeToFile(xc, yc, fileTxtPath){
+		
+		timeArr = newArray(0);
+		traceArr = newArray(0);
+		beginPosition = 0;
+		endPosition = 0;
+		f = File.open(fileTxtPath);
+		for (i=1; i<yc.length; i++){
+			if(yc[i] == 0){		
+ 		    	
+		     	timeArr = Array.slice(xc,beginPosition,i+1);
+				traceArr = Array.slice(yc,beginPosition,i+1);
+				
+				// next round 
+				beginPosition = i +1;
+				i = i +2 ; // Skip the begin zero at the next round
+
+				/* Hidden log
+				print("beginPosition of next array  " + beginPosition);
+				Array.print(timeArr);
+				Array.print(timeArr); */
+
+				String.resetBuffer ;
+				for (j=0; j<timeArr.length; j++){
+					String.append(timeArr[j]+  " \t ");
+				}
+				print(f, "Time "   +"\t"+ String.buffer);
+				String.resetBuffer ;
+
+				for (k=0; k<traceArr.length; k++){
+					String.append(traceArr[k]+  " \t ");
+				}
+				print(f, "Trace "  +"\t"+ String.buffer);
+				String.resetBuffer ;	
+
+				print(f, "");
+			}
+		}			
+		File.close(f);
+
 }
 
 function getStackDifferenceProfile(sname, aname, bname, a1, a2, b1, b2) {

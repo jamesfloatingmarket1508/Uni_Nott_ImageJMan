@@ -2,17 +2,10 @@
 
 macro "Minh" {
 
-	dirname = getDirectory("image");
-	dataname = getTitle();
-	
-    print( "dirname is " + dirname);
+  print("remove last element");
+  a = newArray(1,2,3,4,5);
+  a = Array.slice(a, 0, a.length-1);
+  Array.print(a);
 
-    print("date name" + dataname);
-
-    pathFileTxt = "/Users/votrannhatminh/Documents/Nottingham/StemCell/300_photo_phantich"+ "all_mean_row" +".txt";
-
-    
-    File.append("Lan n" , pathFileTxt);
-	 		
 
 }
