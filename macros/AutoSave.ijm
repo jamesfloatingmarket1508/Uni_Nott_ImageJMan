@@ -7,7 +7,7 @@
 
 
 
-// James wrote function auto-save for 10 days
+// James wrote function auto-save
 showStatus("James wrote this on April");
 var parentDir =  getDirectory("Choose parent dicretory");
 listFolderRecursively(parentDir);

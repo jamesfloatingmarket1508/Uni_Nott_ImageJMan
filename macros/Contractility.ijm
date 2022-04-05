@@ -564,7 +564,7 @@ macro "Contractility" {
 		extractMeanRowToTxtFile();
 
 
-	// James wrote function change csv name 2 days
+	// James wrote function change csv name
 	if (save_results) {
 		updateResults();
 		//saveAs("results", dirname+slicename+".csv");
