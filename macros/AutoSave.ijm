@@ -12,7 +12,7 @@ showStatus("James wrote this on April");
 var parentDir =  getDirectory("Choose parent dicretory");
 listFolderRecursively(parentDir);
 
-// James modified March 2022
+// James modified 2022
   function listFolderRecursively(parentDir) {
       list = getFileList(parentDir);
       for (i=0; i<list.length; i++) {
@@ -21,7 +21,7 @@ listFolderRecursively(parentDir);
           else{
             lastDir =  list[i];
             
-            print("james" + parentDir +lastDir);
+            print("James print log: " + parentDir +lastDir);
             doAutoSaveJob(parentDir);
             break;
           }

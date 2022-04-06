@@ -556,19 +556,19 @@ macro "Contractility" {
 	
 	/*	James wrote 
 		
-		
-
-	*/ 	
 		fileTxtPath = dirname+dataname+"_horizontal"+".txt";
 		displayHorizontallyTraceAndTimeToFile(xc,yc,fileTxtPath);
 		extractMeanRowToTxtFile();
+
+	*/ 	
+		
 
 
 	// James wrote function change csv name
 	if (save_results) {
 		updateResults();
-		//saveAs("results", dirname+slicename+".csv");
-		saveAs("results", dirname+dataname+".csv");
+		saveAs("results", dirname+slicename+".csv");
+		//saveAs("results", dirname+dataname+".csv");
 		}
 
 	
