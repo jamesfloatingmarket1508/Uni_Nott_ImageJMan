@@ -454,7 +454,7 @@ macro "Contractility" {
 	// Save corrected signal profile to text file if requested
 	if (save_profile) {
 		showStatus("Writing profile data to file");
-		f = File.open(dirname+slicename+".txt");
+		f = File.open(dirname+dataname+".txt");
 		for (i=0; i<xc.length; i++)
 			print(f, xc[i]+"\t"+yc[i]);
 		File.close(f);
@@ -556,19 +556,21 @@ macro "Contractility" {
 	
 	/*	James wrote 
 		
-		fileTxtPath = dirname+dataname+"_horizontal"+".txt";
 		displayHorizontallyTraceAndTimeToFile(xc,yc,fileTxtPath);
-		extractMeanRowToTxtFile();
+		fileTxtPath = dirname+dataname+"_horizontal"+".txt";
 
 	*/ 	
 		
-
+		extractMeanRowToTxtFile();
+		
 
 	// James wrote function change csv name
 	if (save_results) {
 		updateResults();
-		saveAs("results", dirname+slicename+".csv");
-		//saveAs("results", dirname+dataname+".csv");
+		//saveAs("results", dirname+slicename+".csv"); // image0.csv  
+		
+		// 
+		saveAs("results", dirname+dataname+".csv");  // folderName.csv
 		}
 
 	
@@ -583,13 +585,13 @@ macro "Contractility" {
 } // End macro "Contractility"
 
 
-// James wrote fuction 2 extract Mean data  3 days
+// James wrote fuction 2 extract Mean data 
 function extractMeanRowToTxtFile(){
 
 	path =   dirname+dataname+".csv" ;
 	parent = File.getParent(path) ;
 	originalselectedFolder = File.getParent(parent) ;
-	meanTxtFile = originalselectedFolder + File.getName(originalselectedFolder)+"_MEAN_" +".txt";
+	meanTxtFile = originalselectedFolder + "_MEAN_" +".txt";
 	
 	headings = split(String.getResultsHeadings);
 
@@ -606,7 +608,7 @@ function extractMeanRowToTxtFile(){
 	  }
 }
 
-// James wrote function 3 time trace - 4 days
+// James wrote function 3 time trace 
 function displayHorizontallyTraceAndTimeToFile(xc, yc, fileTxtPath){
 		
 		timeArr = newArray(0);
