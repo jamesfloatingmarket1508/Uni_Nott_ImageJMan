@@ -555,8 +555,9 @@ macro "Contractility" {
 		}
 	
 		
-		displayHorizontallyTraceAndTimeToFile(xc,yc,fileTxtPath);
+	
 		fileTxtPath = dirname+dataname+"_horizontal"+".txt";
+		displayHorizontallyTraceAndTimeToFile(xc,yc,fileTxtPath);
 
 	
 		extractMeanRowToTxtFile();
