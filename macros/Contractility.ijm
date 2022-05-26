@@ -554,13 +554,11 @@ macro "Contractility" {
 		File.close(f);
 		}
 	
-	/*	James wrote 
 		
 		displayHorizontallyTraceAndTimeToFile(xc,yc,fileTxtPath);
 		fileTxtPath = dirname+dataname+"_horizontal"+".txt";
 
-	*/ 	
-		
+	
 		extractMeanRowToTxtFile();
 		
 
