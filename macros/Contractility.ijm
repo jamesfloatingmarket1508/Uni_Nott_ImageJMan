@@ -148,7 +148,7 @@ macro "Contractility" {
 
 	
 
-		// Save new parameter values to settings file for next time
+		// Default code, Save new parameter values to settings file for next time
 		writeSettingValue("imagescaling", image_scaling, 1);
 		writeSettingValue("frameinterval", frame_interval, 2);
 		writeSettingValue("windowlength", wind_length, 2);
@@ -168,7 +168,7 @@ macro "Contractility" {
 		writeSettingBoolean("saveresults", save_results);
 
 	
-	// James wrote	
+	// James modified for researcher request
 		writeSettingBoolean("manualmode", 0);
 		writeSettingBoolean("filterdata", 1);
 		writeSettingBoolean("showintermediate", 1);
@@ -179,6 +179,13 @@ macro "Contractility" {
 		writeSettingBoolean("saveprofile", 1);
 		writeSettingBoolean("saveresults", 1);
 
+	// July 13, 2022		
+	// Parameters: variable, value, default
+		writeSettingValue("startoffset", 10, 0);
+		writeSettingValue("qualitythreshold", 30, 1);
+		writeSettingValue("startoffset", 10, 0);
+		writeSettingValue("averagemode", 1, 0);  //Align starts, array index is 1
+		
 				
 	}
 	
